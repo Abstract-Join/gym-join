@@ -59,7 +59,7 @@ class Env(object):
             return self.current_state, self.current_state.reward, self.__is_done()
 
         elif action == FORWARD:
-            print(self.current_state.reward)
+            # print(self.current_state.reward)
             try:
                 heappush(self.max_heap, (-self.current_state.reward, randint(0, 10000), self.current_state))
             except:
@@ -68,7 +68,7 @@ class Env(object):
             # if next_r == None:
                 #When outer tuple is completed but k is still not done
             
-            ##TODO Need to clarify if when doing a forward, we need to do a stay as well
+            ##TODO Need to clarify if when after doing a forward, we need to do a stay as well
             self.__get_next_state()
             self.__action_stay()
             return self.current_state, self.current_state.reward, self.__is_done()
@@ -93,15 +93,15 @@ class Env(object):
         return len(self.actions)
     
     def __is_done(self):
-        if len(self.results) <= self.k:
+        if len(self.results) < self.k:
             return False
         return True
     
     def __action_stay(self):
         next_s = self.s_table.next_page()
         success = self.join(self.current_state.page, next_s)
-        # self.current_state.reward += success - len(next_s)
-        self.current_state.reward += success
+        self.current_state.reward += success - len(next_s)
+        # self.current_state.reward += success
 
         self.current_state.pages_joined += 1
 
@@ -118,8 +118,10 @@ class Env(object):
         for inner_tuple in inner_relation_tuples:
 
             if inner_tuple.customer_id in outer_page.customer_id_set:
-                self.results.add(str(inner_tuple.customer_id + "-" + inner_tuple.order_id))
+                self.results.add(inner_tuple.customer_id + "-" + inner_tuple.order_id)
                 count += 1
+                if len(self.results) > self.k:
+                    return count
         return count
 
 
@@ -133,7 +135,7 @@ class Env(object):
             for inner_tuple in s_page:
 
                 if inner_tuple.customer_id in outer_page.customer_id_set:
-                    self.results.add(str(inner_tuple.customer_id + "-" + inner_tuple.order_id))
+                    self.results.add(inner_tuple.customer_id + "-" + inner_tuple.order_id)
 
                     if len(self.results) > self.k:
                         return count
