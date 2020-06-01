@@ -1,5 +1,3 @@
-from itertools import combinations
-import torch
 from queue import PriorityQueue
 from heapq import heappush, heappop
 from db_models import Table, OuterRelationPage

@@ -1,4 +1,4 @@
-from util import load_csv
+from gym_join.envs.util import load_csv
 
 class OuterRelationPage:
 
@@ -21,12 +21,12 @@ class Table:
         self.size = len(self.table)
         self.page_size = page_size
         self.isOuter = isOuter
-        self.page = 0
+        self.page_no = 0
         self.reset = reset
     
 
     def reset_table(self):
-        self.page = 0
+        self.page_no = 0
         self.current_index = 0
 
         
@@ -36,7 +36,7 @@ class Table:
         start_index, end_index = self.__get_next_indexes()
         page = self.table[start_index:end_index]
         if len(page) > 0:
-            self.page += 1
+            self.page_no += 1
 
         if self.isOuter:
             return self.__set_outer_page(page)
@@ -86,31 +86,7 @@ class Table:
         return start_index, end_index
 
 
-def join(outer_page, inner_relation_tuples, results):
-    count = 0
-    for inner_tuple in inner_relation_tuples:
 
-        if inner_tuple.customer_id in outer_page.customer_id_set:
-            results.add(str(inner_tuple.customer_id + "-" + inner_tuple.order_id))
-            count += 1
-    return count
-
-
-def join_all(outer_page, results):
-    s = Table("data/order.tbl", 16, False, False)
-
-
-    s_page  = s.next_page()
-    count = 0
-    while s_page:
-
-        for inner_tuple in s_page:
-
-            if inner_tuple.customer_id in outer_page.customer_id_set:
-                results.add(str(inner_tuple.customer_id + "-" + inner_tuple.order_id))
-            count += 1
-        s_page  = s.next_page()
-    return count
 
 
 

@@ -1,0 +1,5 @@
+env:
+    heap_size: 1000 #TODO Not yet implemented
+    outer_table_path: "data/customer_cleaned.tbl"
+    inner_table_path: "data/order.tbl"
+    k: 1000

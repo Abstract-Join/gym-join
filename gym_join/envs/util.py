@@ -6,7 +6,6 @@ def load_csv(path:str):
         result = []
         for val in csv_reader:
             result.append(val)
-
         return result
 
 """
