@@ -11,7 +11,7 @@ def mruns(config):
 
     env = gym.make('gym_join:join-v0')
     env.set_config(config)
-    m = int(math.sqrt(env._r_table.size / 32))
+    # m = int(math.sqrt(env._r_table.size / 32))
     state = env.reset()
     done = False
     env.action_space

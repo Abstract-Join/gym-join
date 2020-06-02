@@ -68,7 +68,8 @@ class JoinEnv(gym.Env):
     def reset(self):
         self._r_table.reset_table()
         self._s_table.reset_table()
-        return self.__get_next_state()
+        self.__get_next_state()
+        return self._current_state.get_observation()
     
     def get_current_state(self):
         if self._current_state:
