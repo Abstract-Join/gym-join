@@ -83,13 +83,17 @@ class JoinEnv(gym.Env):
             :reward
             :done
         """
-        print(action)
         if action == STAY:
             self.__action_stay()
             return self._current_state.get_observation(), self._current_state.reward, self.__is_done()
 
         elif action == FORWARD:
-            # print(self.current_state.reward)
+            
+
+            #TODO Verify if this doing this is right
+            if len(self._max_heap) == 0:
+                return self._current_state.get_observation(), 0, self.__is_done()
+            
             try:
                 heappush(self._max_heap, (-self._current_state.reward, randint(0, 10000), self._current_state))
             except:
