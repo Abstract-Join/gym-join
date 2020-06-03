@@ -1,7 +1,7 @@
 from queue import PriorityQueue
 from heapq import heappush, heappop
 from gym_join.envs.db_models import Table, OuterRelationPage
-from random import randint
+from random import randint, Random
 import gym
 from gym import error, spaces, utils
 from gym.utils import seeding
@@ -14,8 +14,7 @@ JUMP = 3
 
 OUTER_TABLE_PATH = "outer_table_path"
 INNER_TABLE_PATH = "inner_table_path"
-
-# >>> random.Random(4).shuffle(x)
+PAGE_SIZE = "page_size"
 
 class State:
 
@@ -31,7 +30,7 @@ class State:
         values = []
         # values.append(self.page)
         values.append(self.page_no)
-        values.append(self.reward)
+        # values.append(self.reward)
         values.append(self.pages_joined)
         return np.array(values)
 
@@ -39,7 +38,7 @@ class State:
 def get_observation_space():
     observation = np.array([
     np.finfo(np.float).max,
-    np.finfo(np.float).max,
+    # np.finfo(np.float).max,
     np.finfo(np.float).max])
     return spaces.Box(-observation, observation)
 
@@ -58,11 +57,13 @@ class JoinEnv(gym.Env):
     
     def set_config(self, config):
         env_config = config["env"]
-
-        self._r_table = Table(env_config[OUTER_TABLE_PATH], 16, True)
+        
+        self._r_table = Table(env_config[OUTER_TABLE_PATH], env_config[PAGE_SIZE], env_config["random_seed"], True)
         self._s_path = env_config[INNER_TABLE_PATH]
-        self._s_table = Table(env_config[INNER_TABLE_PATH], 16, False)
+        self._s_table = Table(env_config[INNER_TABLE_PATH], env_config[PAGE_SIZE], env_config["random_seed"] + 1, False)
         # self.min_heap_size = args.heap_size
+        self.page_size = env_config[PAGE_SIZE]
+        self.random_seed = env_config["random_seed"]
         self.k = env_config["k"]
     
     def reset(self):
@@ -108,6 +109,8 @@ class JoinEnv(gym.Env):
             return self._current_state.get_observation(), self._current_state.reward, self.__is_done()
 
         elif action == JUMP:
+            if len(self._max_heap) == 0:
+                return self._current_state.get_observation(), 0, self.__is_done()
             _, _, state = heappop(self._max_heap)
             success = self.__join_all(state.page)
             self.__get_next_state()
@@ -140,7 +143,6 @@ class JoinEnv(gym.Env):
     
     def __get_next_state(self):
         page = self._r_table.next_page()
-        print("Page_no : " + str(self._r_table.page_no - 1))
         state = State(page, self._r_table.page_no - 1)
         self._current_state = state
         return state
@@ -149,17 +151,16 @@ class JoinEnv(gym.Env):
     def __join(self, outer_page, inner_relation_tuples):
         count = 0
         for inner_tuple in inner_relation_tuples:
-
             if inner_tuple.customer_id in outer_page.customer_id_set:
                 self.results.add(inner_tuple.customer_id + "-" + inner_tuple.order_id)
                 count += 1
-                if len(self.results) > self.k:
+                if len(self.results) >= self.k:
                     return count
         return count
 
 
     def __join_all(self, outer_page):
-        s = Table(self._s_path, 16, False, False)
+        s = Table(self._s_path, self.page_size, self.random_seed, False, False)
 
         s_page  = s.next_page()
         count = 0
@@ -170,7 +171,7 @@ class JoinEnv(gym.Env):
                 if inner_tuple.customer_id in outer_page.customer_id_set:
                     self.results.add(inner_tuple.customer_id + "-" + inner_tuple.order_id)
 
-                    if len(self.results) > self.k:
+                    if len(self.results) >= self.k:
                         return count
                 count += 1
             s_page  = s.next_page()

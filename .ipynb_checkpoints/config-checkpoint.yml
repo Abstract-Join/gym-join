@@ -3,5 +3,4 @@ env:
     outer_table_path: "data/customer_cleaned.tbl"
     inner_table_path: "data/order.tbl"
     page_size: 32
-    k: 10000
-    random_seed: 4
+    k: 1000000

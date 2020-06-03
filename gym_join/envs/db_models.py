@@ -1,4 +1,5 @@
 from gym_join.envs.util import load_csv
+from random import Random
 
 class OuterRelationPage:
 
@@ -15,8 +16,10 @@ class InnerRelationTuple:
 
 class Table:
 
-    def __init__(self, path, page_size, isOuter, reset=True):
+    def __init__(self, path, page_size, random_seed, isOuter, reset=True):
         self.table = load_csv(path)
+        Random(random_seed).shuffle(self.table)
+
         self.current_index = 0
         self.size = len(self.table)
         self.page_size = page_size
@@ -46,7 +49,7 @@ class Table:
     def __set_outer_page(self, page):
         id_set = set()
 
-        for val in self.table:
+        for val in page:
             id_set.add(val[0])
         
         if len(id_set) == 0:
@@ -67,7 +70,7 @@ class Table:
     def __get_next_indexes(self):
         
         start_index = self.current_index
-        if start_index + self.page_size + 1 <= self.size:
+        if start_index + self.page_size < self.size:
             end_index = start_index + self.page_size
             self.current_index = end_index
         else:

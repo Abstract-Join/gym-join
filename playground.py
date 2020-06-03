@@ -4,6 +4,7 @@ import math
 from datetime import datetime
 import yaml
 import gym
+from gym_join.envs.db_models import Table
 # r = Table("customer_cleaned.tbl", 16, True)
 # s = Table("order.tbl", 16, False, False)
 
@@ -19,43 +20,13 @@ def mruns(config):
     last_join = 0
     while not done:
         next_state, reward, done = env.step(STAY)
+        print(len(env.results))
+
         print(next_state)
-        # if i == 0:
-        #     next_state, reward, done = env.step(STAY)
-        #     print(next_state)
-        #     i += 1
-        #     continue
-
-        # if reward >= m:
-        #     next_state, reward, done = env.step(JOIN_ALL)
-        #     print(next_state)
-
-        #     reward = 0
-        #     last_join = i
-        # elif i - last_join >= m:
-        #     next_state, reward, done = env.step(JUMP)
-        #     print(next_state)
-
-        #     reward = 0
-        #     last_join = i
-
-        # else:
-        #     next_state, reward, done = env.step(FORWARD)
-        #     print(next_state)
-
-        # i += 1
+        # break
     
-    # print(env.results)
+    print(len(env.results))
 
-            
-            
-
-
-        
-
-        # join(s_result, results)
-
-    # print(results)
 
 
 def nested_loop_join(config):
@@ -74,12 +45,21 @@ def nested_loop_join(config):
 if __name__ == "__main__":
     with open('config.yml') as f:
         config = yaml.safe_load(f)
-    start = datetime.now()
-    mruns(config)
-    print(datetime.now() - start)
-
-    # print("Nested")
+    env_config = config["env"]
     # start = datetime.now()
-
-    # nested_loop_join(config)
+    # mruns(config)
     # print(datetime.now() - start)
+
+    # _r_table = Table(env_config["outer_table_path"], env_config["page_size"], env_config["random_seed"], True)
+
+    # while True:
+    #     page = _r_table.next_page()
+    #     if page == None:
+    #         break
+    #     # print(len(page.customer_id_set))
+
+    print("Nested")
+    start = datetime.now()
+
+    nested_loop_join(config)
+    print(datetime.now() - start)
