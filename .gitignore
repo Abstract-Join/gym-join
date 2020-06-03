@@ -4,3 +4,5 @@ __pycache__/
 .vscode
 data/
 .ipynb_checkpoints
+playground.py
+config.py
