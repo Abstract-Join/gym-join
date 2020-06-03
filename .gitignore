@@ -5,3 +5,4 @@ __pycache__/
 data/
 double dqn.ipynb
 playground.py
+.ipynb_checkpoints
