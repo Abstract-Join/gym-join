@@ -3,6 +3,4 @@ __pycache__/
 *$py.class
 .vscode
 data/
-double dqn.ipynb
-playground.py
 .ipynb_checkpoints
