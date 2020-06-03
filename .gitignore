@@ -5,4 +5,4 @@ __pycache__/
 data/
 .ipynb_checkpoints
 playground.py
-config.py
+config.yml
