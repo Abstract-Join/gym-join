@@ -4,4 +4,5 @@ env:
     inner_table_path: "data/order.tbl"
     page_size: 32
     k: 1000
-    random_seed: 4
+    r_random_seed: 4
+    s_random_seed: 5

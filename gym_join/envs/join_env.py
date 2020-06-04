@@ -15,6 +15,8 @@ JUMP = 3
 OUTER_TABLE_PATH = "outer_table_path"
 INNER_TABLE_PATH = "inner_table_path"
 PAGE_SIZE = "page_size"
+R_SEED = "r_random_seed"
+S_SEED = "s_random_seed"
 
 class State:
 
@@ -58,12 +60,12 @@ class JoinEnv(gym.Env):
     def set_config(self, config):
         env_config = config["env"]
         
-        self._r_table = Table(env_config[OUTER_TABLE_PATH], env_config[PAGE_SIZE], env_config["random_seed"], True)
+        self._r_table = Table(env_config[OUTER_TABLE_PATH], env_config[PAGE_SIZE], env_config[R_SEED], True)
         self._s_path = env_config[INNER_TABLE_PATH]
-        self._s_table = Table(env_config[INNER_TABLE_PATH], env_config[PAGE_SIZE], env_config["random_seed"] + 1, False)
+        self._s_table = Table(env_config[INNER_TABLE_PATH], env_config[PAGE_SIZE], env_config[S_SEED] + 1, False)
         # self.min_heap_size = args.heap_size
         self.page_size = env_config[PAGE_SIZE]
-        self.random_seed = env_config["random_seed"]
+        self.s_seed = env_config[S_SEED]
         self.k = env_config["k"]
     
     def reset(self):
@@ -160,7 +162,7 @@ class JoinEnv(gym.Env):
 
 
     def __join_all(self, outer_page):
-        s = Table(self._s_path, self.page_size, self.random_seed, False, False)
+        s = Table(self._s_path, self.page_size, self.s_seed, False, False)
 
         s_page  = s.next_page()
         count = 0
@@ -170,10 +172,10 @@ class JoinEnv(gym.Env):
 
                 if inner_tuple.customer_id in outer_page.customer_id_set:
                     self.results.add(inner_tuple.customer_id + "-" + inner_tuple.order_id)
-
+                    count += 1
+                    
                     if len(self.results) >= self.k:
                         return count
-                count += 1
             s_page  = s.next_page()
         return count
 
