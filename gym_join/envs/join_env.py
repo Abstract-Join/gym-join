@@ -93,9 +93,9 @@ class JoinEnv(gym.Env):
         elif action == FORWARD:
             
 
-            #TODO Verify if this doing this is right
-            if len(self._max_heap) == 0:
-                return self._current_state.get_observation(), 0, self.__is_done()
+            # #TODO Verify if this doing this is right
+            # if len(self._max_heap) == 0:
+            #     return self._current_state.get_observation(), 0, self.__is_done()
             
             try:
                 heappush(self._max_heap, (-self._current_state.reward, randint(0, 10000), self._current_state))
