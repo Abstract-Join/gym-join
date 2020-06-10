@@ -13,6 +13,7 @@ from datetime import datetime
 from collections import deque
 from IPython.display import clear_output
 import matplotlib.pyplot as plt
+from tensorboardX import SummaryWriter
 
 USE_CUDA = torch.cuda.is_available()
 Variable = lambda *args, **kwargs: autograd.Variable(*args, **kwargs).cuda() if USE_CUDA else autograd.Variable(*args, **kwargs)
@@ -36,9 +37,15 @@ class DQN(nn.Module):
         if random.random() > epsilon:
             state   = Variable(torch.FloatTensor(state).unsqueeze(0), volatile=True)
             q_value = self.forward(state)
+            # print(q_value)
             action  = q_value.max(1)[1].data[0]
         else:
-            action = random.randrange(env.action_space.n)
+            # action = random.randrange(env.action_space.n)
+            if random.random() > 0.8:
+                action = 1
+            else:
+                action = 0
+
         return action
 
 class ReplayBuffer(object):
@@ -88,6 +95,7 @@ def update_target(current_model, target_model):
     target_model.load_state_dict(current_model.state_dict())
 
 def plot(frame_idx, rewards, losses):
+    print("plot")
     clear_output(True)
     plt.figure(figsize=(20,5))
     plt.subplot(131)
@@ -99,19 +107,20 @@ def plot(frame_idx, rewards, losses):
     plt.show()
 
 if __name__ == "__main__":
+    writer = SummaryWriter(logdir='scalar/training')
 
     with open('config.yml') as f:
         config = yaml.safe_load(f)
 
     env_id = 'gym_join:join-v0'
-    print("Gen Bandit Join")
     start = datetime.now()
+
     env = gym.make(env_id)
     env.set_config(config)
 
     epsilon_start = 1.0
     epsilon_final = 0.01
-    epsilon_decay = 500
+    epsilon_decay = 5000
 
     epsilon_by_frame = lambda frame_idx: epsilon_final + (epsilon_start - epsilon_final) * math.exp(-1. * frame_idx / epsilon_decay)
 
@@ -141,26 +150,39 @@ if __name__ == "__main__":
     frame_idx = 0
     done = False
 
-
+    print("Gen Bandit Join")
+    start = datetime.now()
+    total_reward = 0
+    episode_reward = 0
     while not done:
         epsilon = epsilon_by_frame(frame_idx)
         action = current_model.act(state, epsilon)
-        
+        # print("State : " + str(state))       
+        # print(epsilon) 
+
         next_state, reward, done = env.step(action)
         replay_buffer.push(state, action, reward, next_state, done)
+        # print("State : " + str(state) + " Actions : " + str(int(action)) + " Reward : " + str(reward), " NextState : " + str(next_state))
         state = next_state
         episode_reward += reward
         all_rewards.append(reward)
-            
+
+        if action == 1:
+            total_reward += episode_reward
+            print(episode_reward, frame_idx)
+            writer.add_scalar('reward', episode_reward, frame_idx)
+            episode_reward = 0
+
         if len(replay_buffer) > batch_size:
             loss = compute_td_loss(batch_size)
             losses.append(loss.data.item())
             
-    #     if frame_idx % 200 == 0:
-    #         plot(frame_idx, all_rewards, losses)
+        # if frame_idx % 20 == 0:
+        #     plot(frame_idx, all_rewards, losses)
             
         if frame_idx % 100 == 0:
             update_target(current_model, target_model)
         frame_idx += 1
     print("Time taken : " + str(datetime.now() - start))
     print(len(env.results))
+    writer.close()

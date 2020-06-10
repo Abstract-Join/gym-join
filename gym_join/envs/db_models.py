@@ -3,15 +3,15 @@ from random import Random
 
 class OuterRelationPage:
 
-    def __init__(self, customer_id_set):
-        self.customer_id_set = customer_id_set
+    def __init__(self, id1_set):
+        self.id1_set = id1_set
 
 
 class InnerRelationTuple:
 
-    def __init__(self, order_id, customer_id):
-        self.order_id = order_id
-        self.customer_id = customer_id
+    def __init__(self, id1, id2):
+        self.id2 = id2
+        self.id1 = id1
 
 
 class Table:
