@@ -166,10 +166,9 @@ if __name__ == "__main__":
         state = next_state
         episode_reward += reward
         all_rewards.append(reward)
-
         if action == 1:
             total_reward += episode_reward
-            print(episode_reward, frame_idx)
+            print(episode_reward)
             writer.add_scalar('reward', episode_reward, frame_idx)
             episode_reward = 0
 

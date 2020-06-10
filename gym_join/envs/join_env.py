@@ -91,9 +91,10 @@ class JoinEnv(gym.Env):
         if action == STAY:
             if self._current_state.curr_tuples_tried >= self._s_table.size:
                 self.__action_forward()
-                print("Stay: Forward")
+                print("Stay: Forward : " + str(self._current_state.tuples_joined))
 
             reward = self.__action_stay()
+
             return self._current_state.get_observation(), reward, self.__is_done()
 
         elif action == FORWARD:

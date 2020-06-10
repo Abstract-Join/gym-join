@@ -1,6 +1,7 @@
 from datetime import datetime
 import yaml
 from gym_join.envs.db_models import Table
+import gym
 
 OUTER_TABLE_PATH = "outer_table_path"
 INNER_TABLE_PATH = "inner_table_path"
@@ -39,7 +40,15 @@ if __name__ == "__main__":
         config = yaml.safe_load(f)
     env_config = config["env"]
 
+    env_id = 'gym_join:join-v0'
+    env = gym.make(env_id)
+    env.set_config(config)
+
     print("Block Nested Loop Join")
     start = datetime.now()
-    nested_loop_join(config)
+    env.reset()
+    done = False
+    while not done:
+        _, reward, done = env.step(0)
+
     print("Time taken : " + str(datetime.now() - start))
