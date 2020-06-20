@@ -20,24 +20,41 @@ class DQN(nn.Module):
         super(DQN, self).__init__()
         
         self.layers = nn.Sequential(
-            nn.Linear(env.observation_space.shape[0], 64),
+            nn.Linear(env.observation_space.shape[0], 128),
             nn.ReLU(),
-            nn.Linear(64, 64),
+            nn.Linear(128, 128),
             nn.ReLU(),
-            nn.Linear(64, env.action_space.n)
+            nn.Linear(128, env.action_space.n)
         )
         
     def forward(self, x):
         return self.layers(x)
     
+    # def act(self, state, epsilon):
+    #     if random.random() > epsilon:
+    #         state   = Variable(torch.FloatTensor(state).unsqueeze(0), volatile=True)
+    #         q_value = self.forward(state)
+    #         action  = q_value.max(1)[1].data[0]
+    #     else:
+    #         action = random.randrange(env.action_space.n)
+    #     return action
+
     def act(self, state, epsilon):
         if random.random() > epsilon:
             state   = Variable(torch.FloatTensor(state).unsqueeze(0), volatile=True)
             q_value = self.forward(state)
+            # q_values
+            # print(q_value)
             action  = q_value.max(1)[1].data[0]
         else:
-            action = random.randrange(env.action_space.n)
+            if random.random() < 0.8:
+                action = 0
+            else:
+                action = 1
+
+
         return action
+
 
 class ReplayBuffer(object):
     def __init__(self, capacity):
@@ -121,7 +138,7 @@ if __name__ == "__main__":
     replay_buffer = ReplayBuffer(1000)
 
 
-    batch_size = 8
+    batch_size = 16
     gamma      = 0.5
 
     losses = []
@@ -132,7 +149,7 @@ if __name__ == "__main__":
     frame_idx = 0
     done = False
 
-
+    start = datetime.now()
     while not done:
         epsilon = epsilon_by_frame(frame_idx)
         action = model.act(state, epsilon)

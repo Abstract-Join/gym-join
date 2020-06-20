@@ -30,7 +30,7 @@ class State:
 
     def get_observation(self):
         values = []
-        values.append(self.blocks_read)
+        # values.append(self.blocks_read)
         values.append(self.tuples_joined)
         # values.append(self.page_no)
         values.append(self.tuples_tried)
@@ -39,7 +39,7 @@ class State:
 
 def get_observation_space():
         observation = np.array([
-        np.finfo(np.float).max,
+        # np.finfo(np.float).max,
         np.finfo(np.float).max,
         # np.finfo(np.float).max,
         np.finfo(np.float).max])

@@ -37,14 +37,15 @@ class DQN(nn.Module):
         if random.random() > epsilon:
             state   = Variable(torch.FloatTensor(state).unsqueeze(0), volatile=True)
             q_value = self.forward(state)
+            # q_values
             # print(q_value)
             action  = q_value.max(1)[1].data[0]
         else:
-            # action = random.randrange(env.action_space.n)
-            if random.random() > 0.8:
-                action = 1
-            else:
+            if random.random() < 0.8:
                 action = 0
+            else:
+                action = 1
+
 
         return action
 
@@ -101,9 +102,9 @@ def plot(frame_idx, rewards, losses):
     plt.subplot(131)
     plt.title('frame %s. reward: %s' % (frame_idx, np.mean(rewards[-10:])))
     plt.plot(rewards)
-    plt.subplot(132)
-    plt.title('loss')
-    plt.plot(losses)
+    # plt.subplot(132)
+    # plt.title('loss')
+    # plt.plot(losses)
     plt.show()
 
 if __name__ == "__main__":
@@ -120,7 +121,7 @@ if __name__ == "__main__":
 
     epsilon_start = 1.0
     epsilon_final = 0.01
-    epsilon_decay = 5000
+    epsilon_decay = 100
 
     epsilon_by_frame = lambda frame_idx: epsilon_final + (epsilon_start - epsilon_final) * math.exp(-1. * frame_idx / epsilon_decay)
 
@@ -139,7 +140,7 @@ if __name__ == "__main__":
     update_target(current_model, target_model)
 
 
-    batch_size = 8
+    batch_size = 15
     gamma      = 0.5
 
     losses = []
@@ -154,6 +155,9 @@ if __name__ == "__main__":
     start = datetime.now()
     total_reward = 0
     episode_reward = 0
+    forward = 0
+    stay = 0
+    epi_reward_list = []
     while not done:
         epsilon = epsilon_by_frame(frame_idx)
         action = current_model.act(state, epsilon)
@@ -168,20 +172,28 @@ if __name__ == "__main__":
         all_rewards.append(reward)
         if action == 1:
             total_reward += episode_reward
-            print(episode_reward)
+            # print(episode_reward)
+            epi_reward_list.append(episode_reward)
+            forward += 1
             writer.add_scalar('reward', episode_reward, frame_idx)
             episode_reward = 0
-
+        else:
+            stay += 1
         if len(replay_buffer) > batch_size:
             loss = compute_td_loss(batch_size)
             losses.append(loss.data.item())
             
         # if frame_idx % 20 == 0:
-        #     plot(frame_idx, all_rewards, losses)
+        #     plot(frame_idx, forward, stay)
             
         if frame_idx % 100 == 0:
             update_target(current_model, target_model)
         frame_idx += 1
+    
+    plot(len(epi_reward_list), epi_reward_list, None)
+    print("Forward : " + str(forward))
+    print("Stay : " + str(stay))
+
     print("Time taken : " + str(datetime.now() - start))
     print(len(env.results))
     writer.close()
