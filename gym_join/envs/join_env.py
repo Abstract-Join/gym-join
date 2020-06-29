@@ -20,7 +20,7 @@ S_SEED = "s_random_seed"
 
 class State:
 
-    def __init__(self, page:OuterRelationPage, page_no):
+    def __init__(self, page:OuterRelationPage, page_no, r_disc=20):
         self.page = page
         self.blocks_read = 0
         self.tuples_joined = 0
@@ -29,11 +29,12 @@ class State:
         self.curr_tuples_tried = 0
         # self.curr_blocks_tried = 0
         self.state_id = 0
+        self.r_disc = r_disc
 
     def get_observation(self):
         values = []
         # values.append(self.blocks_read)
-        values.append(self.tuples_joined)
+        values.append(self.tuples_joined % self.r_disc)
         # values.append(self.page_no)
         # values.append(self.curr_blocks_tried)
         values.append(self.state_id)
@@ -76,7 +77,7 @@ class JoinEnv(gym.Env):
         self._s_table.reset_table()
 
         page = self._r_table.next_page()
-        state = State(page, self._r_table.page_no - 1)
+        state = State(page, self._r_table.page_no - 1, self.config["reward_discretizer"])
         self._current_state = state
 
         return self._current_state.get_observation()

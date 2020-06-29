@@ -43,13 +43,19 @@ if __name__ == "__main__":
     env_id = 'gym_join:join-v0'
     env = gym.make(env_id)
     env.set_config(config)
-
+    
     print("Block Nested Loop Join")
-    start = datetime.now()
-    env.reset()
-    done = False
-    while not done:
-        _, reward, done = env.step(0)
 
-    print("Time taken : " + str(datetime.now() - start))
-    print(len(env.results))
+    iters = 5
+    total_time = 0
+    for _ in range(iters):
+            
+        start = datetime.now().timestamp()
+        env.reset()
+        done = False
+        while not done:
+            _, reward, done = env.step(0)
+        total_time += (datetime.now().timestamp() - start)
+        print(len(env.results))
+    print("Avg time taken after " + str(iters) + " iterations : " + str(total_time / iters))
+

@@ -167,7 +167,7 @@ def q_learning_new(env, discount_factor=1.0, alpha=0.6, epsilon=0.1):
 
         action = ep_policy(state, epsilon, Q)
         next_state, reward, done = env.step(action)
-        print(state, next_state, reward, action)
+        # print(state, next_state, reward, action)
         # print(next_state)
         next_state = tuple(next_state)
         # print(next_state)
@@ -190,16 +190,20 @@ def q_learning_new(env, discount_factor=1.0, alpha=0.6, epsilon=0.1):
 
     return Q
 
+if __name__ == "__main__":
 
-start = datetime.now()
- 
-Q = q_learning_new(env)
-print(datetime.now() - start)
-print(len(env.results))
+    iters = 5
+    total_time = 0
+    for _ in range(iters):
+            
+        start = datetime.now().timestamp()
+        
+        Q = q_learning_new(env)
+        total_time += (datetime.now().timestamp() - start)
+        # print(datetime.now() - start)
+        print(len(env.results))
+    print("Avg time taken after " + str(iters) + " iterations : " + str(total_time / iters))
 
-# for store, stuff in Q.items():
-    # print(store, stuff)
-# print(Q.keys())
 
 
 
