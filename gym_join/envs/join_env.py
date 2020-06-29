@@ -34,7 +34,7 @@ class State:
     def get_observation(self):
         values = []
         # values.append(self.blocks_read)
-        values.append(self.tuples_joined % self.r_disc)
+        values.append(self.tuples_joined // self.r_disc)
         # values.append(self.page_no)
         # values.append(self.curr_blocks_tried)
         values.append(self.state_id)
@@ -139,7 +139,7 @@ class JoinEnv(gym.Env):
         return True
     
     def __redirect_action(self, action):
-        if self._current_state.state_id == len(self.k_array) - 1:
+        if self._current_state.state_id == len(self.k_array):
             if action == 0:
                 action = 2
         return action
@@ -148,9 +148,8 @@ class JoinEnv(gym.Env):
         if is_initial_state:
             return self.__action_k_stay(1)
 
+        success = self.__action_k_stay(self.k_array[self._current_state.state_id])
         self._current_state.state_id += 1
-
-        success = self.__action_k_stay(self.k_array[self._current_state.state_id - 1])
 
         return success
     

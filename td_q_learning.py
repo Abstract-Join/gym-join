@@ -164,10 +164,10 @@ def q_learning_new(env, discount_factor=1.0, alpha=0.6, epsilon=0.1):
     while not done:
         # print(epsilon)
         epsilon = epsilon_by_iteration(iterations)
-
+        
         action = ep_policy(state, epsilon, Q)
         next_state, reward, done = env.step(action)
-        # print(state, next_state, reward, action)
+        print(state, next_state, reward, action)
         # print(next_state)
         next_state = tuple(next_state)
         # print(next_state)
@@ -192,7 +192,7 @@ def q_learning_new(env, discount_factor=1.0, alpha=0.6, epsilon=0.1):
 
 if __name__ == "__main__":
 
-    iters = 5
+    iters = 1
     total_time = 0
     for _ in range(iters):
             
