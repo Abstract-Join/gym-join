@@ -39,7 +39,7 @@ if __name__ == "__main__":
     with open('config.yml') as f:
         config = yaml.safe_load(f)
     env_config = config["env"]
-
+    
     env_id = 'gym_join:join-v0'
     env = gym.make(env_id)
     env.set_config(config)
@@ -52,3 +52,4 @@ if __name__ == "__main__":
         _, reward, done = env.step(0)
 
     print("Time taken : " + str(datetime.now() - start))
+    print(len(env.results))

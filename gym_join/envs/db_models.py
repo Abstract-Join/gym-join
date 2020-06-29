@@ -16,8 +16,12 @@ class InnerRelationTuple:
 
 class Table:
 
-    def __init__(self, path, page_size, random_seed, isOuter, reset=True):
-        self.table = load_csv(path)
+    def __init__(self, path, page_size, random_seed, isOuter, reset=True, table=None):
+        if path == None:
+            self.table = table
+        else:
+            self.table = load_csv(path)
+            
         Random(random_seed).shuffle(self.table)
 
         self.current_index = 0
