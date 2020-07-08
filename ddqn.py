@@ -190,9 +190,9 @@ if __name__ == "__main__":
             update_target(current_model, target_model)
         frame_idx += 1
     
-    plot(len(epi_reward_list), epi_reward_list, None)
-    print("Forward : " + str(forward))
-    print("Stay : " + str(stay))
+    # plot(len(epi_reward_list), epi_reward_list, None)
+    # print("Forward : " + str(forward))
+    # print("Stay : " + str(stay))
 
     print("Time taken : " + str(datetime.now() - start))
     print(len(env.results))

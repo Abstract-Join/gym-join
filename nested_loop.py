@@ -41,15 +41,15 @@ if __name__ == "__main__":
     env_config = config["env"]
     
     env_id = 'gym_join:join-v0'
-    env = gym.make(env_id)
-    env.set_config(config)
+   
     
     print("Block Nested Loop Join")
 
-    iters = 5
+    iters = 2
     total_time = 0
     for _ in range(iters):
-            
+        env = gym.make(env_id)
+        env.set_config(config)
         start = datetime.now().timestamp()
         env.reset()
         done = False

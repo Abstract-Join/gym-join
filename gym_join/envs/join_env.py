@@ -85,6 +85,11 @@ class JoinEnv(gym.Env):
     def get_current_state(self):
         if self._current_state:
             return self._current_state.get_observation()
+    
+    def get_db_size(self):
+        if self._r_table == None:
+            return None
+        return self._r_table.size, self._s_table.size
 
     def step(self, action):
         """
@@ -147,7 +152,7 @@ class JoinEnv(gym.Env):
     def __action_stay(self, is_initial_state):
         if is_initial_state:
             return self.__action_k_stay(1)
-
+        
         success = self.__action_k_stay(self.k_array[self._current_state.state_id])
         self._current_state.state_id += 1
 
@@ -170,7 +175,7 @@ class JoinEnv(gym.Env):
         return s
     
     def __action_forward(self):
-   
+        
         page = self._r_table.next_page()
         if page == None:
             self._current_state.page = None
