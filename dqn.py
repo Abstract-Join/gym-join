@@ -20,40 +20,40 @@ class DQN(nn.Module):
         super(DQN, self).__init__()
         
         self.layers = nn.Sequential(
-            nn.Linear(env.observation_space.shape[0], 128),
+            nn.Linear(env.observation_space.shape[0], 4),
             nn.ReLU(),
-            nn.Linear(128, 128),
+            nn.Linear(4, 8),
             nn.ReLU(),
-            nn.Linear(128, env.action_space.n)
+            nn.Linear(8, env.action_space.n)
         )
         
     def forward(self, x):
         return self.layers(x)
     
-    # def act(self, state, epsilon):
-    #     if random.random() > epsilon:
-    #         state   = Variable(torch.FloatTensor(state).unsqueeze(0), volatile=True)
-    #         q_value = self.forward(state)
-    #         action  = q_value.max(1)[1].data[0]
-    #     else:
-    #         action = random.randrange(env.action_space.n)
-    #     return action
-
     def act(self, state, epsilon):
         if random.random() > epsilon:
             state   = Variable(torch.FloatTensor(state).unsqueeze(0), volatile=True)
             q_value = self.forward(state)
-            # q_values
-            # print(q_value)
             action  = q_value.max(1)[1].data[0]
         else:
-            if random.random() < 0.8:
-                action = 0
-            else:
-                action = 1
-
-
+            action = random.randrange(env.action_space.n)
         return action
+
+    # def act(self, state, epsilon):
+    #     if random.random() > epsilon:
+    #         state   = Variable(torch.FloatTensor(state).unsqueeze(0), volatile=True)
+    #         q_value = self.forward(state)
+    #         # q_values
+    #         # print(q_value)
+    #         action  = q_value.max(1)[1].data[0]
+    #     else:
+    #         if random.random() < 0.8:
+    #             action = 0
+    #         else:
+    #             action = 1
+
+
+    #     return action
 
 
 class ReplayBuffer(object):
@@ -118,7 +118,7 @@ if __name__ == "__main__":
 
     env_id = 'gym_join:join-v0'
     print("DQN Gen Bandit Join")
-    start = datetime.now()
+    # start = datetime.now()
     env = gym.make(env_id)
     env.set_config(config)
 

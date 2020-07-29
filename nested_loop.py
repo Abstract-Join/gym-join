@@ -9,6 +9,7 @@ PAGE_SIZE = "page_size"
 R_SEED = "r_random_seed"
 S_SEED = "s_random_seed"
 
+
 def nested_loop_join(config):
     env_config = config["env"]
     r_table = Table(env_config[OUTER_TABLE_PATH], env_config[PAGE_SIZE], env_config[R_SEED], True)
@@ -32,21 +33,14 @@ def nested_loop_join(config):
                     count += 1
                     if len(result_set) >= k:
                         return result_set
-        print(count)
+        # print(count)
 
-
-if __name__ == "__main__":
-    with open('config.yml') as f:
-        config = yaml.safe_load(f)
-    env_config = config["env"]
-    
+def start_experiment(config, iters):
+  
     env_id = 'gym_join:join-v0'
    
-    
-    print("Block Nested Loop Join")
-
-    iters = 2
     total_time = 0
+    results = 0
     for _ in range(iters):
         env = gym.make(env_id)
         env.set_config(config)
@@ -56,6 +50,27 @@ if __name__ == "__main__":
         while not done:
             _, reward, done = env.step(0)
         total_time += (datetime.now().timestamp() - start)
-        print(len(env.results))
-    print("Avg time taken after " + str(iters) + " iterations : " + str(total_time / iters))
+        results += len(env.results)
+
+    return total_time / iters, results / iters
+    
+if __name__ == "__main__":
+    with open('config.yml') as f:
+        config = yaml.safe_load(f)
+    
+    print("Block Nested Loop Join")
+
+    # page_sizes = [32, 64, 128, 256, 512]
+    # k_size = [50, 100, 500, 1000, 5000, 10000, 50000]
+
+    page_sizes = [64, 128, 256, 512]
+    k_size = [1000, 5000, 10000]
+
+    # n_array = 2
+    for k in k_size:
+        config["env"]["k"] = k
+        for page_size in page_sizes:
+            config["env"]["page_size"] = page_size
+            time, avg_results = start_experiment(config, 3)
+            print(k, page_size, time, avg_results)
 
